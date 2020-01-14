@@ -1,0 +1,30 @@
+menu:
+  - item:
+      display: 'Thrust'
+      type: rosservice
+      service: /minibot/controller/thrust
+      service_class: mini_pilot.srv.Thrust
+      params: 
+          duration: 5     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          distance: None
+          thrust:         #'rp/motion_primatives_controller/forward_thrust'
+
+  - item: 
+      display: 'Pitch'
+      type: rosservice
+      service: /minibot/controller/pitch
+      service_class: Pitch
+      params:
+        duration:       #'rp/motion_primatives_controller/pitch_duration'
+        angles: None    # Or, [0, 45, 0]
+        thrust:         #'rp/motion_primatives_controller/pitch_thrust'
+        
+  - item: 
+      display: 'Yaw'
+      type: rosservice
+      service: /minibot/controller/yaw
+      service_class: Yaw
+      params:
+        duration:       #'rp/motion_primatives_controller/yaw_duration'
+        angles: None    # Or, [0, 0, 45]
+        thrust:         #'rp/motion_primatives_controller/yaw_thrust'
