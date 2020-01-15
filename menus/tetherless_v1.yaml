@@ -5,9 +5,9 @@ menu:
       service: /minibot/controller/thrust
       service_class: mini_pilot.srv.Thrust
       params: 
-          duration: 1     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
-          distance: None
-          thrust: 0.1         #'rp/motion_primatives_controller/forward_thrust'
+          duration: 10     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          distance: 0
+          thrust: 0.6         #'rp/motion_primatives_controller/forward_thrust'
   - item: 
       display: 'SquareSmall'
       type: rosservice
@@ -16,6 +16,7 @@ menu:
       params:
         sideA: 1
         sideB: 1
+        thrust: 0.6
         right: True
 
   - item: 
@@ -26,6 +27,7 @@ menu:
       params:
         sideA: 2
         sideB: 2
+        thrust: 0.6
         right: True
 
   - item:
@@ -33,4 +35,4 @@ menu:
       type: kill
       node_names:
         - '/record_odom'
-        - '/recod_camera'
+        - '/record_camera'
