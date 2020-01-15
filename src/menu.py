@@ -27,28 +27,26 @@ class Menu(object):
                 elif item['type'] == 'kill':
                     self.items.append(ItemKill(item))
 
-            for item in self.items:
-                print(item)
-        
         self.input = None
         self.input_time = None
         self.unhandled_input = False
 
     
     def tag_callback(self, data):
-        self.input = data.tags[0]
-        self.input_time= data.header.stamp.sec
+	if len(data.tags) > 0:
+	        self.input = data.tags[0]
+        	#self.input_time= data.header.stamp.sec
 
-        rospy.loginfo('Recieved tag %d'%(input.id))
+	        rospy.loginfo('Recieved tag %d'%(self.input.id))
 
-        if not self.unhandled_input:
-            rospy.loginfo('No current input waiting in queue, so marking unhandled')
-            self.unhandled_input = True
+        	if not self.unhandled_input:
+	            rospy.loginfo('No current input waiting in queue, so marking unhandled')
+        	    self.unhandled_input = True
 
     def menu_update(self):
         if self.unhandled_input:
             rospy.loginfo('Input waiting for handling, searching...')
-            for idx, item in self.items:
+            for idx, item in enumerate(self.items):
                 rospy.loginfo('Index %d, Item: %r'%(idx, item))
                 if idx == self.input.id:
                     rospy.loginfo('Item selected, executing')
