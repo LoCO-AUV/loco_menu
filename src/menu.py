@@ -14,6 +14,10 @@ class Menu(object):
         self.rate = rospy.Rate(30)
         rospy.Subscriber("/minibot/tags", Tags, self.tag_callback)
 
+        self.input = None
+        self.input_time = None
+        self.unhandled_input = False
+
         self.items = list()
         with open(rospy.get_param('~menu_def_file')) as file:
             output = yaml.load(file, Loader=yaml.SafeLoader)
@@ -22,28 +26,24 @@ class Menu(object):
             for item in menu_data:
                 item = item['item']
 
+                rospy.loginfo(item)
                 if item['type'] == 'rosservice':
+                    rospy.loginfo('Creating ServiceItem')
                     self.items.append(ItemService(item))
                 elif item['type'] == 'kill':
+                    rospy.loginfo('Creating KillItem')
                     self.items.append(ItemKill(item))
-                else:
-                    continue
-
-        self.input = None
-        self.input_time = None
-        self.unhandled_input = False
-
     
     def tag_callback(self, data):
         if len(data.tags) > 0:
-                self.input = data.tags[0]
-                #self.input_time= data.header.stamp.sec
+            self.input = data.tags[0]
+            #self.input_time= data.header.stamp.sec
 
-                rospy.loginfo('Recieved tag %d'%(self.input.id))
+            rospy.loginfo('Recieved tag %d'%(self.input.id))
 
-                if not self.unhandled_input:
-                    rospy.loginfo('No current input waiting in queue, so marking unhandled')
-                    self.unhandled_input = True
+            if not self.unhandled_input:
+                rospy.loginfo('No current input waiting in queue, so marking unhandled')
+                self.unhandled_input = True
                     
     def menu_update(self):
         if self.unhandled_input:

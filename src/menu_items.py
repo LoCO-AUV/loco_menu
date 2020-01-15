@@ -27,7 +27,7 @@ class ItemService(Item):
         self.proxy(**self.params)
 
 
-class ItemLaunch(Item):
+class ItemKill(Item):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
         self.node_names = item_yaml['node_names']
@@ -44,6 +44,6 @@ class ItemBag(Item):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
 
-class ItemKill(Item):
+class ItemLaunch(Item):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
