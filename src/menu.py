@@ -44,7 +44,7 @@ class Menu(object):
                 if not self.unhandled_input:
                     rospy.loginfo('No current input waiting in queue, so marking unhandled')
                     self.unhandled_input = True
-
+                    
     def menu_update(self):
         if self.unhandled_input:
             rospy.loginfo('Input waiting for handling, searching...')
