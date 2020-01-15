@@ -5,7 +5,7 @@ menu:
       service: /minibot/controller/thrust
       service_class: mini_pilot.srv.Thrust
       params: 
-          duration: 2     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          duration: 2.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
           distance: 0.0
           thrust: 0.2         #'rp/motion_primatives_controller/forward_thrust'
 
@@ -15,7 +15,7 @@ menu:
       service: /minibot/controller/pitch
       service_class: mini_pilot.srv.Pitch
       params:
-        duration: 2       #'rp/motion_primatives_controller/pitch_duration'
+        duration: 2.0       #'rp/motion_primatives_controller/pitch_duration'
         angle: 0.0    # Or, [0, 45, 0]
         thrust: 0.2        #'rp/motion_primatives_controller/pitch_thrust'
         
@@ -25,6 +25,6 @@ menu:
       service: /minibot/controller/yaw
       service_class: mini_pilot.srv.Yaw
       params:
-        duration: 2       #'rp/motion_primatives_controller/yaw_duration'
+        duration: 2.0       #'rp/motion_primatives_controller/yaw_duration'
         angle: 0.0    # Or, [0, 0, 45]
         thrust: 0.2      #'rp/motion_primatives_controller/yaw_thrust'

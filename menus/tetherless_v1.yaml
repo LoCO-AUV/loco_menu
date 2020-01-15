@@ -5,30 +5,29 @@ menu:
       service: /minibot/controller/thrust
       service_class: mini_pilot.srv.Thrust
       params: 
-          duration: 10     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
-          distance: 0
+          duration: 10.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          distance: 0.0
           thrust: 0.6         #'rp/motion_primatives_controller/forward_thrust'
   - item: 
-      display: 'SquareSmall'
+      display: 'Square'
       type: rosservice
       service: /minibot/controller/square
       service_class: mini_pilot.srv.Square
       params:
-        sideA: 1
-        sideB: 1
+        sideA: 1.0
+        sideB: 1.0
         thrust: 0.6
         right: True
 
   - item: 
-      display: 'SquareLarge'
+      display: 'Circle'
       type: rosservice
-      service: /minibot/controller/square
-      service_class: mini_pilot.srv.Square
+      service: /minibot/controller/circle
+      service_class: mini_pilot.srv.Circle
       params:
-        sideA: 2
-        sideB: 2
+        duration: 30.0
+        radius: 0.0
         thrust: 0.6
-        right: True
 
   - item:
       display: 'KillBags'
@@ -36,3 +35,12 @@ menu:
       node_names:
         - '/record_odom'
         - '/record_camera'
+
+  - item: 
+      display: 'Carry'
+      type: service
+      service_class: mini_pilot.srv.Thrust
+      params: 
+          duration: 30.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          distance: 0.0
+          thrust: 0.9 
