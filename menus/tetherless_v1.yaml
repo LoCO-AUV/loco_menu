@@ -32,5 +32,5 @@ menu:
       display: 'KillBags'
       type: kill
       node_names:
-        - '/odom_bag'
-        - '/cam_bag'
+        - '/record_odom'
+        - '/recod_camera'
