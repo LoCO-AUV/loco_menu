@@ -3,7 +3,7 @@
 import rospy
 import yaml
 
-from menu_items import Item, ItemService
+from menu_items import Item, ItemService, ItemKill
 from ar_recog.msg import Tags, Tag
 from std_msgs.msg import Header
 
@@ -24,6 +24,8 @@ class Menu(object):
 
                 if item['type'] == 'rosservice':
                     self.items.append(ItemService(item))
+                elif item['type'] == 'kill':
+                    self.items.append(ItemKill(item))
 
             for item in self.items:
                 print(item)
