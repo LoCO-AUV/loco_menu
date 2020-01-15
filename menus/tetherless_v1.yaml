@@ -6,7 +6,7 @@ menu:
       service_class: mini_pilot.srv.Thrust
       params: 
           duration: 1     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
-          distance: None
+          distance: 0
           thrust: 0.1         #'rp/motion_primatives_controller/forward_thrust'
   - item: 
       display: 'SquareSmall'
