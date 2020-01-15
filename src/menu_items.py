@@ -22,6 +22,7 @@ class ItemService(Item):
         return "Item: name=%r type=%r service=%r params=%r"%(self.name, "Service", self.service, self.params)
 
     def execute(self):
+        rospy.loginfo('Executing service item')
         self.proxy(**self.params)
 
 

@@ -37,15 +37,21 @@ class Menu(object):
         self.input = data.tags[0]
         self.input_time= data.header.stamp.sec
 
+        rospy.loginfo('Recieved tag %d'%(input.id))
+
         if not self.unhandled_input:
+            rospy.loginfo('No current input waiting in queue, so marking unhandled')
             self.unhandled_input = True
 
     def menu_update(self):
         if self.unhandled_input:
+            rospy.loginfo('Input waiting for handling, searching...')
             for idx, item in self.items:
+                rospy.loginfo('Index %d, Item: %r'%(idx, item))
                 if idx == self.input.id:
+                    rospy.loginfo('Item selected, executing')
                     item.execute()
-                    self.unhandled_input = True
+                    self.unhandled_input = False
                     break
 
 
