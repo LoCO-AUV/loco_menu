@@ -11,6 +11,7 @@ class ItemService(Item):
         self.name = item_yaml['display']
         self.service = item_yaml['service']
         self.service_class = pydoc.locate(item_yaml['service_class'])
+	
         
         rospy.wait_for_service(self.service)
         self.proxy = rospy.ServiceProxy(self.service, self.service_class)
