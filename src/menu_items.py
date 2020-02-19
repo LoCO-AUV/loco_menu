@@ -1,4 +1,5 @@
 import rospy
+import rosnode
 import pydoc
 
 class Item(object):
@@ -22,15 +23,27 @@ class ItemService(Item):
         return "Item: name=%r type=%r service=%r params=%r"%(self.name, "Service", self.service, self.params)
 
     def execute(self):
+        rospy.loginfo('Executing service item')
         self.proxy(**self.params)
 
+
+class ItemKill(Item):
+    def __init__(self, item_yaml):
+        self.name = item_yaml['display']
+        self.node_names = item_yaml['node_names']
+
+    def __str__(self):
+        return "Item: name=%r kill nodes=%r"%(self.name, self.node_names)
+
+    def execute(self):
+        rospy.loginfo('Executing node kill item')
+        rosnode.kill_nodes(self.node_names)
+    
+
+class ItemBag(Item):
+    def __init__(self, item_yaml):
+        self.name = item_yaml['display']
 
 class ItemLaunch(Item):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
-
-class ItemBag(Item):
-    def __init__(self, item_yaml):
-        self.name = item_yaml['displ[ay']
-
-    

@@ -8,7 +8,6 @@ menu:
           duration: 5     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
           distance: None
           thrust: 0.1         #'rp/motion_primatives_controller/forward_thrust'
-
   - item: 
       display: 'Pitch'
       type: rosservice
