@@ -15,7 +15,7 @@ class Menu(object):
         rospy.Subscriber("/minibot/tags", Tags, self.tag_callback)
 
         self.items = list()
-        with open(rospy.get_param('/minibot_menu/menu_def_file')) as file:
+        with open(rospy.get_param('~menu_def_file')) as file:
             output = yaml.load(file, Loader=yaml.SafeLoader)
             menu_data = output['menu']
 

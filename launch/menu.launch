@@ -1,4 +1,5 @@
 <launch>
+    <include file="$(find ar_recog)/launch/edgebot.launch"/>
     <node pkg="mini_menu" type="menu.py" name="mini_menu">
         <param name="menu_def_file" value="$(find mini_menu)/menus/first_menu.yaml"/>
     </node>
