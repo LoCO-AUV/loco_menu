@@ -2,8 +2,8 @@ menu:
   - item:
       display: 'Thrust'
       type: rosservice
-      service: /minibot/controller/thrust
-      service_class: mini_pilot.srv.Thrust
+      service: /loco/controller/thrust
+      service_class: loco_pilot.srv.Thrust
       params: 
           duration: 10.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
           distance: 0.0
@@ -11,8 +11,8 @@ menu:
   - item: 
       display: 'Square'
       type: rosservice
-      service: /minibot/controller/square
-      service_class: mini_pilot.srv.Square
+      service: /loco/controller/square
+      service_class: loco_pilot.srv.Square
       params:
         sideA: 1.0
         sideB: 1.0
@@ -22,8 +22,8 @@ menu:
   - item: 
       display: 'Circle'
       type: rosservice
-      service: /minibot/controller/circle
-      service_class: mini_pilot.srv.Circle
+      service: /loco/controller/circle
+      service_class: loco_pilot.srv.Circle
       params:
         duration: 20.0
         radius: 0.0

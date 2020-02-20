@@ -10,9 +10,9 @@ from std_msgs.msg import Header
 class Menu(object): 
 
     def __init__(self):
-        rospy.init_node("minibot_menu")
+        rospy.init_node("loco_menu")
         self.rate = rospy.Rate(30)
-        rospy.Subscriber("/minibot/tags", Tags, self.tag_callback)
+        rospy.Subscriber("/loco/tags", Tags, self.tag_callback)
 
         self.input = None
         self.input_time = None
