@@ -5,6 +5,7 @@ import pydoc
 class Item(object):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
+        
 
 
 class ItemService(Item):

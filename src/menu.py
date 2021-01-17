@@ -5,7 +5,7 @@ import yaml
 
 from menu_items import Item, ItemService, ItemKill
 from ar_recog.msg import Tags, Tag
-from std_msgs.msg import Header
+from std_msgs.msg import Header, String
 
 class Menu(object): 
 
@@ -14,24 +14,37 @@ class Menu(object):
         self.rate = rospy.Rate(30)
         rospy.Subscriber("/loco/tags", Tags, self.tag_callback)
 
+        # display publisher
+        display_pub = rospy.Publisher('/loco/display', String, queue_size= 10)
+        display_pub.publish("test entry")  
+
         self.input = None
         self.input_time = None
         self.unhandled_input = False
 
+        # read in number of lines on display. can read in height/width here too.
+        with open(rospy.get_param('display_def_file')) as file:
+            display_output = yaml.load(file, Loader=yaml.SafeLoader)
+            self.lines = display_output['lines']
+            rospy.loginfo("Loaded number of lines: %d", self.lines)
+
+        # read in items 
         self.items = list()
         with open(rospy.get_param('~menu_def_file')) as file:
             output = yaml.load(file, Loader=yaml.SafeLoader)
             menu_data = output['menu']
+            rospy.loginfo('Found %d items in the menu yaml', len(menu_data))
 
             for item in menu_data:
                 item = item['item']
+                rospy.loginfo(item)
 
                 rospy.loginfo(item)
                 if item['type'] == 'rosservice':
-                    rospy.loginfo('Creating ServiceItem')
+                    rospy.loginfo('Creating ServiceItem: %s', item['display'])
                     self.items.append(ItemService(item))
                 elif item['type'] == 'kill':
-                    rospy.loginfo('Creating KillItem')
+                    rospy.loginfo('Creating KillItem: %s', item['display'])
                     self.items.append(ItemKill(item))
     
     def tag_callback(self, data):
@@ -58,11 +71,17 @@ class Menu(object):
 
 
     def menu_graphical_update(self):
-        pass    
+        menu_entries = ""
+        for item in self.items:
+            menu_entries += item + "\n"
+        menu_entries = "item 1 \n item 2 \n item 3 \n" #debug
+        display_pub.publish(menu_entries)  
+        rospy.loginfo('Published to display.')
 
 if __name__ == '__main__':
     m = Menu()
 
     while not rospy.is_shutdown():
         m.menu_update()
+        m.menu_graphical_update()
         m.rate.sleep()
