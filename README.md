@@ -12,9 +12,10 @@
 
 ## Notes
 ### Display Publisher
-        Uses standard string messages of the form where each menu line is delimited by a following newline character.
+Uses standard string messages of the form where each menu line is delimited by a following newline character.
+
 ### Sending Messages via Command Line
-catkin_make, catkin_make install, source devel/setup.bash  
-rostopic pub /loco/tags ar_recog/Tags "Message definition"  
+`catkin_make`, `catkin_make install`, `source devel/setup.bash`  
+`rostopic pub /loco/tags ar_recog/Tags "Message definition"`  
 
 The message definition will tab complete if you've got the messages built on your machine, and the only field you will need to update is the id field, which can be seen in this message definition ( https://github.umn.edu/IRVLab/minnebot/blob/irv_aqua/catkin_base_ws/src/aqua_related/ar_recog/msg/Tag.msg). Update that to the number you want, and you can hit enter to publish. The Tags message type, btw (https://github.umn.edu/IRVLab/minnebot/blob/irv_aqua/catkin_base_ws/src/aqua_related/ar_recog/msg/Tags.msg), is just a header and a few other things attached to an array of Tag messages. 
