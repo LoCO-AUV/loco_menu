@@ -1,11 +1,11 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 import rospy
 import yaml
 
 from std_msgs.msg import String
 
-#import consolemenu // may use for final console menu
+#import consolemenu # may use for final console menu
 # from consolemenu import *
 # from consolemenu.items import *
 
@@ -27,8 +27,8 @@ class Display(object):
         #parse for newline characters
         lines = data.split("\n");
 
-        # draw for menu
-        for l in lines:
+        print(chr(27) + "[2J")  # clear the menu
+        for l in lines:         # print the menu
             rospy.loginfo(l)
         # TODO make this an actual menu
 

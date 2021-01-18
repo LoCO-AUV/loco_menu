@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+#find_package(consolemenu REQUIRED) #test
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -105,7 +106,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mini_menu
 #  CATKIN_DEPENDS ar_recog rospy
-#  DEPENDS system_lib
+#  DEPENDS system_lib 
 )
 
 ###########
@@ -117,6 +118,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  #${consolemenu_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library

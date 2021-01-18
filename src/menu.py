@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 import rospy
 import yaml
@@ -37,15 +37,13 @@ class Menu(object):
 
             for item in menu_data:
                 item = item['item']
-                rospy.loginfo(item)
-
-                rospy.loginfo(item)
                 if item['type'] == 'rosservice':
                     rospy.loginfo('Creating ServiceItem: %s', item['display'])
                     self.items.append(ItemService(item))
                 elif item['type'] == 'kill':
                     rospy.loginfo('Creating KillItem: %s', item['display'])
                     self.items.append(ItemKill(item))
+        rospy.loginfo()
     
     def tag_callback(self, data):
         if len(data.tags) > 0:
