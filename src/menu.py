@@ -1,29 +1,11 @@
-#! /usr/bin/python
-
-# This code is a part of the LoCO AUV project.
-# Copyright (C) The Regents of the University of Minnesota
-
-# Maintainer: Junaed Sattar <junaed@umn.edu> and the Interactive Robotics and Vision Laboratory
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#! /usr/bin/python3
 
 import rospy
 import yaml
 
 from menu_items import Item, ItemService, ItemKill
 from ar_recog.msg import Tags, Tag
-from std_msgs.msg import Header
+from std_msgs.msg import Header, String
 
 class Menu(object): 
 
@@ -32,25 +14,36 @@ class Menu(object):
         self.rate = rospy.Rate(30)
         rospy.Subscriber("/loco/tags", Tags, self.tag_callback)
 
+        # display publisher
+        display_pub = rospy.Publisher('/loco/display', String, queue_size= 10)
+        display_pub.publish("test entry")  
+
         self.input = None
         self.input_time = None
         self.unhandled_input = False
 
+        # read in number of lines on display. can read in height/width here too.
+        with open(rospy.get_param('display_def_file')) as file:
+            display_output = yaml.load(file, Loader=yaml.SafeLoader)
+            self.lines = display_output['lines']
+            rospy.loginfo("Loaded number of lines: %d", self.lines)
+
+        # read in items 
         self.items = list()
         with open(rospy.get_param('~menu_def_file')) as file:
             output = yaml.load(file, Loader=yaml.SafeLoader)
             menu_data = output['menu']
+            rospy.loginfo('Found %d items in the menu yaml', len(menu_data))
 
             for item in menu_data:
                 item = item['item']
-
-                rospy.loginfo(item)
                 if item['type'] == 'rosservice':
-                    rospy.loginfo('Creating ServiceItem')
+                    rospy.loginfo('Creating ServiceItem: %s', item['display'])
                     self.items.append(ItemService(item))
                 elif item['type'] == 'kill':
-                    rospy.loginfo('Creating KillItem')
+                    rospy.loginfo('Creating KillItem: %s', item['display'])
                     self.items.append(ItemKill(item))
+        rospy.loginfo()
     
     def tag_callback(self, data):
         if len(data.tags) > 0:
@@ -76,11 +69,17 @@ class Menu(object):
 
 
     def menu_graphical_update(self):
-        pass    
+        menu_entries = ""
+        for item in self.items:
+            menu_entries += item + "\n"
+        menu_entries = "item 1 \n item 2 \n item 3 \n" #debug
+        display_pub.publish(menu_entries)  
+        rospy.loginfo('Published to display.')
 
 if __name__ == '__main__':
     m = Menu()
 
     while not rospy.is_shutdown():
         m.menu_update()
+        m.menu_graphical_update()
         m.rate.sleep()
