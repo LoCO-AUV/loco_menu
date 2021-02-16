@@ -1,0 +1,29 @@
+menu:
+  - item:
+      display: 'Thrust'
+      type: rosservice
+      service: /loco/controller/thrust
+      service_class: loco_pilot.srv.Thrust
+      params: 
+          duration: 5     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          distance: None
+          thrust: 0.1         #'rp/motion_primatives_controller/forward_thrust'
+  - item: 
+      display: 'Pitch'
+      type: rosservice
+      service: /loco/controller/pitch
+      service_class: loco_pilot.srv.Pitch
+      params:
+        duration: 5       #'rp/motion_primatives_controller/pitch_duration'
+        angles: None    # Or, [0, 45, 0]
+        thrust: 0.1        #'rp/motion_primatives_controller/pitch_thrust'
+        
+  - item: 
+      display: 'Yaw'
+      type: rosservice
+      service: /loco/controller/yaw
+      service_class: loco_pilot.srv.Yaw
+      params:
+        duration: 5       #'rp/motion_primatives_controller/yaw_duration'
+        angles: None    # Or, [0, 0, 45]
+        thrust: 0.1      #'rp/motion_primatives_controller/yaw_thrust'

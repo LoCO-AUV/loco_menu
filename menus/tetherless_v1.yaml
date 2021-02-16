@@ -1,0 +1,37 @@
+menu:
+  - item:
+      display: 'Thrust'
+      type: rosservice
+      service: /loco/controller/thrust
+      service_class: loco_pilot.srv.Thrust
+      params: 
+          duration: 10.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+          distance: 0.0
+          thrust: 0.4         #'rp/motion_primatives_controller/forward_thrust'
+  - item: 
+      display: 'Square'
+      type: rosservice
+      service: /loco/controller/square
+      service_class: loco_pilot.srv.Square
+      params:
+        sideA: 1.0
+        sideB: 1.0
+        thrust: 0.4
+        right: True
+
+  - item: 
+      display: 'Circle'
+      type: rosservice
+      service: /loco/controller/circle
+      service_class: loco_pilot.srv.Circle
+      params:
+        duration: 20.0
+        radius: 0.0
+        thrust: 0.4
+
+  - item:
+      display: 'KillBags'
+      type: kill
+      node_names:
+        - '/record_odom'
+        - '/record_camera'

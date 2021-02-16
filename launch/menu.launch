@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="loco_menu" type="menu.py" name="mini_menu" respawn="true" respawn_delay="30">
+        <param name="menu_def_file" value="$(find mini_menu)/menus/tetherless_v1.yaml"/>
+    </node>
+</launch>
