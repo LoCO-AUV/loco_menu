@@ -1,6 +1,7 @@
 import rospy
 import rosnode
 import pydoc
+import rosbag
 
 class Item(object):
     def __init__(self, item_yaml):
@@ -44,7 +45,18 @@ class ItemKill(Item):
 class ItemBag(Item):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
+        # bagmode, currently set to append
+
+    def execute(self):
+        self.bag = rosbag.Bag(self.name,'a')
+        # subscribe to /rosout
+        # write all messages
+
+    #def rosout_callback(self)
 
 class ItemLaunch(Item):
     def __init__(self, item_yaml):
         self.name = item_yaml['display']
+    
+    def execute(self):
+        pass
