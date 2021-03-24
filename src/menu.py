@@ -80,7 +80,7 @@ class Menu(object):
             menu_entries += item.name + "\n"
         menu_entries = "item 1 \n item 2 \n item 3 \n" #debug
         self.display_pub.publish(menu_entries)  
-        rospy.loginfo('Published to display.')
+        #rospy.loginfo('Published to display.')
 
 if __name__ == '__main__':
     m = Menu()
