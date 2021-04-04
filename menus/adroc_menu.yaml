@@ -1,0 +1,13 @@
+menu:
+  - item:
+      display: 'Approach Diver'
+      pre_delay: 5.0
+      type: rosaction
+      action: adroc
+      action_class: adroc.msg.ApproachDiverAction
+      goal_class: adroc.msg.ApproachDiverGoal
+      result_class: adroc.msg.ApproachDiverResult
+      goal_data: 0
+      wait_for_result: True
+      wait_time: 60.0
+      display_feedback: True

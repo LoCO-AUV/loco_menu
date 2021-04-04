@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 # This code is a part of the LoCO AUV project.
 # Copyright (C) The Regents of the University of Minnesota
@@ -21,7 +21,7 @@
 import rospy
 import yaml
 
-from menu_items import Item, ItemService, ItemKill
+from menu_items import Item, ItemService, ItemAction, ItemKill
 from ar_recog.msg import Tags, Tag
 from std_msgs.msg import Header
 
@@ -48,6 +48,9 @@ class Menu(object):
                 if item['type'] == 'rosservice':
                     rospy.loginfo('Creating ServiceItem')
                     self.items.append(ItemService(item))
+                elif item['type'] == 'rosaction':
+                    rospy.loginfo('Creating ActionItem')
+                    self.items.append(ItemAction(item))
                 elif item['type'] == 'kill':
                     rospy.loginfo('Creating KillItem')
                     self.items.append(ItemKill(item))
