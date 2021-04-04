@@ -23,14 +23,16 @@ import yaml
 
 from menu_items import Item, ItemService, ItemAction, ItemKill
 from ar_recog.msg import Tags, Tag
-from std_msgs.msg import Header
+from std_msgs.msg import Header, String
 
 class Menu(object): 
 
     def __init__(self):
         rospy.init_node("loco_menu")
-        self.rate = rospy.Rate(30)
+        self.rate = rospy.Rate(10)
         rospy.Subscriber("/loco/tags", Tags, self.tag_callback)
+
+        self.display_pub = rospy.Publisher('/loco/menu_display', String, queue_size=1)
 
         self.input = None
         self.input_time = None
@@ -39,7 +41,9 @@ class Menu(object):
         self.items = list()
         with open(rospy.get_param('~menu_def_file')) as file:
             output = yaml.load(file, Loader=yaml.SafeLoader)
+            self.menu_name = output['menu_name']
             menu_data = output['menu']
+
 
             for item in menu_data:
                 item = item['item']
@@ -54,6 +58,10 @@ class Menu(object):
                 elif item['type'] == 'kill':
                     rospy.loginfo('Creating KillItem')
                     self.items.append(ItemKill(item))
+
+        self.menu_string = "LIT;      %s;"%(self.menu_name)
+        for idx, item in enumerate(self.items):
+            self.menu_string += "%r. %s;"%(idx, item.name)
     
     def tag_callback(self, data):
         if len(data.tags) > 0:
@@ -73,17 +81,22 @@ class Menu(object):
                 rospy.loginfo('Index %d, Item: %r'%(idx, item))
                 if idx == self.input.id:
                     rospy.loginfo('Item selected, executing')
-                    item.execute()
+                    item.execute(self.display_pub)
                     self.unhandled_input = False
                     break
 
 
     def menu_graphical_update(self):
-        pass    
+        # This is for just displaying the menu. Gotta do some stuff to make sure that we do different things when the menu is blocking.
+        msg = String()
+        msg.data = self.menu_string
+        self.display_pub.publish(msg)
+        
 
 if __name__ == '__main__':
     m = Menu()
 
     while not rospy.is_shutdown():
         m.menu_update()
+        m.menu_graphical_update()
         m.rate.sleep()

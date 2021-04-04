@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import rospy
+from std_msgs.msg import String
 import rosnode
 import actionlib
 import pydoc
@@ -44,7 +45,7 @@ class ItemService(Item):
     def __str__(self):
         return "Item: name=%r type=%r service=%r params=%r"%(self.name, "Service", self.service, self.params)
 
-    def execute(self):
+    def execute(self, display_pub):
         rospy.loginfo('Executing service item')
 
         if(self.pre_delay > 0):
@@ -62,7 +63,7 @@ class ItemKill(Item):
     def __str__(self):
         return "Item: name=%r kill nodes=%r"%(self.name, self.node_names)
 
-    def execute(self):
+    def execute(self, display_pub):
         rospy.loginfo('Executing node kill item')
 
         if(self.pre_delay > 0):
@@ -93,8 +94,13 @@ class ItemAction(Item):
     def __str__(self):
          return "Item: name=%r type=%r action=%r waiting?=%r wait_time=%r"%(self.name, "Action", self.action, self.wait, self.wait_time)
 
-    def execute(self):
+
+    def execute(self, display_pub):
         rospy.loginfo("Executing action item")
+        msg = String()
+        msg.data = "LIT; EXEC:%s"%(self.name)
+        display_pub.publish(msg)
+
         if(self.pre_delay > 0):
             rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
             time.sleep(self.pre_delay)
