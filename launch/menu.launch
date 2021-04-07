@@ -1,5 +1,5 @@
 <launch>
-    <node pkg="loco_menu" type="menu.py" name="loco_menu" respawn="true" respawn_delay="30" output="screen">
+    <node pkg="loco_menu" type="loco_menu_node.py" name="loco_menu" respawn="true" respawn_delay="30" output="screen">
         <param name="menu_def_file" value="$(find loco_menu)/menus/adroc_menu.yaml"/>
     </node>
 </launch>

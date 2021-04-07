@@ -21,82 +21,61 @@
 import rospy
 import yaml
 
-from menu_items import Item, ItemService, ItemAction, ItemKill
+from menu_node import MenuNode
+from menu_items import Item, ItemAction, ItemBag, ItemKill, ItemLaunch, ItemNode, ItemService
+
 from ar_recog.msg import Tags, Tag
 from std_msgs.msg import Header, String
 
-class Menu(object): 
+class Menu(MenuNode): 
+    def __init__(self, parent, yaml_data, display_publisher):
+        super(Menu, self).__init__(parent)
+        self.display_publisher = display_publisher
 
-    def __init__(self):
-        rospy.init_node("loco_menu")
-        self.rate = rospy.Rate(10)
-        rospy.Subscriber("/loco/tags", Tags, self.tag_callback)
-
-        self.display_pub = rospy.Publisher('/loco/menu_display', String, queue_size=1)
-
-        self.input = None
-        self.input_time = None
-        self.unhandled_input = False
-
-        self.items = list()
-        with open(rospy.get_param('~menu_def_file')) as file:
-            output = yaml.load(file, Loader=yaml.SafeLoader)
-            self.menu_name = output['menu_name']
-            menu_data = output['menu']
-
-
-            for item in menu_data:
-                item = item['item']
-
-                rospy.loginfo(item)
-                if item['type'] == 'rosservice':
-                    rospy.loginfo('Creating ServiceItem')
-                    self.items.append(ItemService(item))
-                elif item['type'] == 'rosaction':
-                    rospy.loginfo('Creating ActionItem')
-                    self.items.append(ItemAction(item))
-                elif item['type'] == 'kill':
-                    rospy.loginfo('Creating KillItem')
-                    self.items.append(ItemKill(item))
-
-        self.menu_string = "LIT;      %s;"%(self.menu_name)
-        for idx, item in enumerate(self.items):
-            self.menu_string += "%r. %s;"%(idx, item.name)
-    
-    def tag_callback(self, data):
-        if len(data.tags) > 0:
-            self.input = data.tags[0]
-            #self.input_time= data.header.stamp.sec
-
-            rospy.loginfo('Recieved tag %d'%(self.input.id))
-
-            if not self.unhandled_input:
-                rospy.loginfo('No current input waiting in queue, so marking unhandled')
-                self.unhandled_input = True
-                    
-    def menu_update(self):
-        if self.unhandled_input:
-            rospy.loginfo('Input waiting for handling, searching...')
-            for idx, item in enumerate(self.items):
-                rospy.loginfo('Index %d, Item: %r'%(idx, item))
-                if idx == self.input.id:
-                    rospy.loginfo('Item selected, executing')
-                    item.execute(self.display_pub)
-                    self.unhandled_input = False
-                    break
-
-
-    def menu_graphical_update(self):
-        # This is for just displaying the menu. Gotta do some stuff to make sure that we do different things when the menu is blocking.
-        msg = String()
-        msg.data = self.menu_string
-        self.display_pub.publish(msg)
+        # print(yaml_data)
+        menu_data = yaml_data
+        self.name = menu_data['name']
         
+        for node in menu_data['items']:
+            node_type = list(node.keys())[0]
+            node_yaml = node[node_type]
 
-if __name__ == '__main__':
-    m = Menu()
+            if node_type == 'menu':
+                self.children.append(Menu(self, node_yaml, display_publisher))
 
-    while not rospy.is_shutdown():
-        m.menu_update()
-        m.menu_graphical_update()
-        m.rate.sleep()
+            elif node_type == 'rosaction':
+                rospy.loginfo('Creating ActionItem')
+                self.children.append(ItemAction(self, node_yaml))
+
+            elif node_type == 'rosservice':
+                rospy.loginfo('Creating ServiceItem')
+                self.children.append(ItemService(self, node_yaml))
+
+            elif node_type == 'roslaunch':
+                rospy.loginfo('Creating LaunchItem')
+                self.children.append(ItemLaunch(self, node_yaml))
+            
+            elif node_type == 'rosbag':
+                rospy.loginfo('Creating BagItem')
+                self.children.append(ItemBag(self, node_yaml))
+
+            elif node_type == 'rosnode':
+                rospy.loginfo('Creating NodeItem')
+                self.children.append(ItemNode(self, node_yaml))
+                
+            elif node_type == 'kill_nodes':
+                rospy.loginfo('Creating KillItem')
+                self.children.append(ItemKill(self, node_yaml))
+
+    def __str__(self):
+        ret = "Menu: %s\nChildren:{ "%(self.name)
+        for c in self.children:
+            ret += str(c) + '; '
+        ret += '}'
+        return ret
+
+    def to_display_string(self):
+        display_string = "LIT;      %s;"%(self.name)
+        for idx, item in enumerate(self.children):
+            display_string += "%r. %s;"%((idx+1), item.name)
+        return display_string
