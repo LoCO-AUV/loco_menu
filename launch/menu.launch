@@ -1,5 +1,9 @@
 <launch>
-    <node pkg="loco_menu" type="loco_menu_node.py" name="loco_menu" respawn="true" respawn_delay="30" output="screen">
+    <arg name="menu_start_delay" default="3.0" /> 
+    <node pkg="rosserial_python" type="serial_node.py" name="rosserial_menu" respawn="true" respawn_delay="30" args="_port:=/dev/ttyACM0" output="screen">
+    </node>
+    <node pkg="loco_menu" type="loco_menu_node.py" name="loco_menu" respawn="true" respawn_delay="30" output="screen" launch-prefix="bash -c 'sleep $(arg menu_start_delay); $0 $@' " >
         <param name="menu_def_file" value="$(find loco_menu)/menus/adroc_menu.yaml"/>
     </node>
+    
 </launch>

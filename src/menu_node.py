@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import rospy
 
 class MenuNode(object):
     def __init__(self, parent):
@@ -29,4 +30,30 @@ class MenuNode(object):
         self.foreground = False
         self.foreground_since = None
 
+    def activate(self):
+        self.running = True
+        self.running_since = rospy.get_time()
+        self.foreground = True
+        self.foreground_since = rospy.get_time()
+
+    def deactivate(self):
+        self.running = False
+        self.running_since = None
+        self.foreground = False
+        self.foreground_since = None
         
+    def set_running(self, val):
+        if val:
+            self.running = True
+            self.running_since = rospy.get_time()
+        else:
+            self.running = False
+            self.running_since = None
+
+    def set_foreground(self, val):
+        if val:
+            self.foreground = True
+            self.foreground_since = rospy.get_time()
+        else:
+            self.foreground = False
+            self.foreground_since = None

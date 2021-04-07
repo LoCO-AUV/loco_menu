@@ -30,6 +30,7 @@ from std_msgs.msg import String
 
 import pydoc
 import time
+import threading
 
 #Base class
 class Item(MenuNode):
@@ -58,21 +59,25 @@ class ItemService(Item):
     def __str__(self):
         return "Item: name=%r type=%r service=%r params=%r"%(self.name, "Service", self.service, self.params)
 
-    def execute(self, display_pub):
+    def execute(self):
         rospy.loginfo('Executings service item')
         msg = String()
         msg.data = "LIT; EXEC:%s"%(self.name)
-        display_pub.publish(msg)
+        self.parent.display_publisher.publish(msg)
 
         if(self.pre_delay > 0):
             rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
             rospy.sleep(self.pre_delay)
+
+        self.activate()
             
         self.proxy(**self.params)
 
         if(self.post_delay > 0):
             rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
             rospy.sleep(self.post_delay)
+        
+        self.deactivate()
 
 # Node killing for loco menu
 class ItemKill(Item):
@@ -83,21 +88,25 @@ class ItemKill(Item):
     def __str__(self):
         return "Item: name=%r kill nodes=%r"%(self.name, self.node_names)
 
-    def execute(self, display_pub):
+    def execute(self):
         rospy.loginfo('Executing node kill item')
         msg = String()
         msg.data = "LIT; EXEC:%s"%(self.name)
-        display_pub.publish(msg)
+        self.parent.display_publisher.publish(msg)
 
         if(self.pre_delay > 0):
             rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
             rospy.sleep(self.pre_delay)    
+
+        self.activate()
 
         rosnode.kill_nodes(self.node_names)
 
         if(self.post_delay > 0):
             rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
             rospy.sleep(self.post_delay)
+
+        self.deactivate()
 
 
 # Actions are provided by actionlib, and are similar to services, but have a goal, feedback in the meantime, 
@@ -120,30 +129,56 @@ class ItemAction(Item):
          return "Item: name=%r type=%r action=%r"%(self.name, "Action", self.action)
 
 
-    def execute(self, display_pub):
-        rospy.loginfo("Executing action item")
+    def execute(self):
+        if not self.running:
+            rospy.loginfo("Executing action item")
 
-        msg = String()
-        msg.data = "LIT; EXEC:%s"%(self.name)
-        display_pub.publish(msg)
+            msg = String()
+            msg.data = "LIT; EXEC:%s"%(self.name)
+            self.parent.display_publisher.publish(msg)
 
-        if(self.pre_delay > 0):
-            rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
-            rospy.sleep(self.pre_delay)
+            if(self.pre_delay > 0):
+                rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
+                rospy.sleep(self.pre_delay)
+
+            self.activate()
+                
+            goal = self.goal_class()
+            goal.diver_id = self.goal_data
+            self.action_client.send_goal(goal)
+
+            if ((not self.background) and (self.timeout > 0)):
+                finished = self.action_client.wait_for_result(rospy.Duration.from_sec(self.timeout))
+                if not finished and self.kill_after_timeout:
+                    self.kill()
+
+            if self.background and self.kill_after_timeout and (self.timeout > 0):
+                threading.Timer(self.timeout, self.kill ).start()
+
+            if(self.post_delay > 0):
+                rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
+                rospy.sleep(self.post_delay)
             
-        goal = self.goal_class()
-        goal.diver_id = self.goal_data
-        self.action_client.send_goal(goal)
+            self.set_foreground(False)
+            
+        else:
+            rospy.loginfo("Canceling rosaction due to a request.")
+            msg = String()
+            msg.data = "LIT; Canceling"
+            self.parent.display_publisher.publish(msg)
+            time.sleep(1)
+            self.action_client.cancel_goal()
+            self.deactivate()
 
-        if ((not self.background) and (self.timeout > 0)):
-            finished = self.action_client.wait_for_result(rospy.Duration.from_sec(self.timeout))
-            if not finished and self.kill_after_timeout:
-                rospy.loginfo("Canceling goal due to timeout.")
-                self.action_client.cancel_goal()
-
-        if(self.post_delay > 0):
-            rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
-            rospy.sleep(self.post_delay)
+    def kill(self):
+        if self.running:
+            rospy.loginfo("Canceling rosaction due to a timeout.")
+            msg = String()
+            msg.data = "LIT; Canceling"
+            self.parent.display_publisher.publish(msg)
+            time.sleep(1)
+            self.action_client.cancel_goal()
+            self.deactivate()
 
 # Launch files for LoCO Menu
 class ItemLaunch(Item):
@@ -163,33 +198,64 @@ class ItemLaunch(Item):
         return "Item: name=%r type=%r pkg=%r file=%r"%(self.name, "Launch", self.package, self.launch_file)
 
     
-    def execute(self, display_pub):
-        rospy.loginfo('Executing launch item')
-        msg = String()
-        msg.data = "LIT; EXEC:%s"%(self.name)
-        display_pub.publish(msg)
+    def execute(self):
+        if not self.running:
+            rospy.loginfo('Executing launch item')
+            msg = String()
+            msg.data = "LIT; EXEC:%s"%(self.name)
+            self.parent.display_publisher.publish(msg)
 
-        # Pre-delay
-        if(self.pre_delay > 0):
-            rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
-            rospy.sleep(self.pre_delay)    
+            # Pre-delay
+            if(self.pre_delay > 0):
+                rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
+                rospy.sleep(self.pre_delay)
+            
+            self.activate()
 
-        # Prep and launch launch file.
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        roslaunch.configure_logging(uuid)
-        self.launch = roslaunch.parent.ROSLaunchParent(uuid, [self.lf_path])
-        self.launch.start()
+            # Prep and launch launch file.
+            uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+            roslaunch.configure_logging(uuid)
+            self.launch = roslaunch.parent.ROSLaunchParent(uuid, [self.lf_path])
+            self.launch.start()
 
-        # If we're doing foreground, do that here.
-        if ((not self.background) and (self.timeout > 0)):
-            rospy.sleep(self.timeout)
-            if self.kill_after_timeout:
-                self.launch.shutdown()
+            # If we're doing foreground, do that here.
+            if ((not self.background) and (self.timeout > 0)):
+                rospy.sleep(self.timeout)
+                if self.kill_after_timeout:
+                    self.kill()
+            
+            if self.background and self.kill_after_timeout and (self.timeout > 0):
+                threading.Timer(self.timeout, self.kill ).start()
 
-        # Post-delay
-        if(self.post_delay > 0):
-            rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
-            rospy.sleep(self.post_delay)
+
+            # Post-delay
+            if(self.post_delay > 0):
+                rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
+                rospy.sleep(self.post_delay)
+            
+            self.set_foreground(False)
+        else:
+            rospy.loginfo("Canceling roslaunch due to a request.")
+            msg = String()
+            msg.data = "LIT; Canceling"
+            self.parent.display_publisher.publish(msg)
+            time.sleep(1)
+
+            self.launch.shutdown()
+            self.deactivate()
+
+    def kill(self):
+        if self.running:
+            rospy.loginfo("Canceling roslaunch due to timeout.")
+            msg = String()
+            msg.data = "LIT; Canceling"
+            self.parent.display_publisher.publish(msg)
+            time.sleep(1)
+
+            self.launch.shutdown()
+            self.deactivate()
+
+            
 
 
 class ItemBag(Item):

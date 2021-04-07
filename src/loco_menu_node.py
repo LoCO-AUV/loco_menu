@@ -45,6 +45,7 @@ def tag_callback(data):
 
         if not input_unhandled:
             rospy.loginfo('No current input waiting in queue, so marking unhandled')
+
             input_unhandled = True
 
 # Wrapper function for the Menu yaml processing
@@ -63,14 +64,11 @@ def menu_state_upate(menu):
         if menu.parent is None:
             rospy.loginfo("No parent menu, remaining at current level.")
 
-            input_unhandled = False
             return menu, False
         else:
             rospy.loginfo("Going to parent menu.")
-            menu.foreground = False
-            menu.foreground_since = None
+            menu.set_foreground(False)
 
-            input_unhandled = False
             return menu.parent, True
 
     for idx, item in enumerate(menu.children):
@@ -78,19 +76,15 @@ def menu_state_upate(menu):
         if idx == (menu_input.id - 1):
             if type(item) is Menu:
                 rospy.loginfo('Going to submenu: %s'%(item.name))
-                item.foreground = True
-                item.foreground_since = rospy.get_time()
+                item.set_foreground(True)
 
-                input_unhandled = False
                 return item, True
             else:
                 rospy.loginfo('Executing item %r'%(item.name))
-                item.execute(menu.display_publisher)
-
-                input_unhandled = False
+                item.execute()
+                
                 return menu, True
     
-    input_unhandled = False
     return menu, True
 
 
@@ -118,6 +112,8 @@ if __name__ == '__main__':
             root_menu, display_changed = menu_state_upate(root_menu)
             if display_changed:
                 menu_graphical_update(root_menu)
+            rospy.sleep(1)
+            input_unhandled = False
 
         rate.sleep()
         
