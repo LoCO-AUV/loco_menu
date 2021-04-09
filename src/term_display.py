@@ -26,7 +26,7 @@ class Display(object):
 
         # create named pipe
         ros2ui_path = "loco_display_ros2ui"
-        ui2ros_path = "/tmp/loco_display_ui2ros"
+        ui2ros_path = "loco_display_ui2ros"
         files_made = False
         try:
             os.mkfifo(ros2ui_path)
@@ -34,31 +34,24 @@ class Display(object):
         except OSError as e:
             if e.errno == 17:
                 files_made = True
+                rospy.loginfo("Created named files.")
             else:
-                rospy.logerr("ERROR: Failed to create named pipe. (%s)", e)
+                rospy.logerr("Failed to create named pipe. (%s)", e)
         else:   
             files_made = True
+            rospy.loginfo("Created named files.")
 
         if files_made:
-            os.chmod(ros2ui_path, 755)
-            os.chmod(ui2ros_path, 755)
-            self.ros2ui_pipe = open(ros2ui_path, 'r')
-            self.ui2ros_pipe = open(ui2ros_path, 'w')
+            self.ros2ui_pipe = open(ros2ui_path, 'w')
+            rospy.loginfo("Created ros2ui pipe.")
+            self.ui2ros_pipe = open(ui2ros_path, 'r')
+            rospy.loginfo("Created ui2ros pipe.")
+            rospy.loginfo("Created named pipes.")
 
-
-        
+   
     def display_update_callback(self, data):
-        pass
-        # os.write(self.pipe, data)
-        # self.pipe.flush()
-        # os.fsync(self.pipe.fileno())
-        #parse for newline characters
-        # lines = data.split("\n");
-
-        # print(chr(27) + "[2J")  # clear the menu
-        # for l in lines:         # print the menu
-        #     rospy.loginfo(l)
-        # TODO make this an actual menu
+        self.ros2ui_pipe.write(data)
+        rospy.loginfo("sent data ('{0}') to menu display.".format(data))
 
 if __name__=='__main__':
     d = Display()
