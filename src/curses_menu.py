@@ -242,6 +242,7 @@ class UI(object):
 
 
         # loop and write
+        # we write the text of the item, which should be the display field of the yaml file.
         while (self.running & made_pipe):
             if self.selected_item != None:
                 if os.write(self.ui2ros_pipe, self.selected_item) != len(self.selected_item):

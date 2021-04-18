@@ -43,12 +43,12 @@ class Menu(object):
                 elif item['type'] == 'kill':
                     rospy.loginfo('Creating KillItem: %s', item['display'])
                     self.items.append(ItemKill(item))
-                elif item['type'] == 'bag':
-                    rospy.loginfo('Creating BagItem: %s', item['display'])
-                    self.items.append(ItemBag(item))
-                elif item['type'] == 'launch':
-                    rospy.loginfo('Creating LaunchItem: %s', item['display'])
-                    self.items.append(ItemLaunch(item))
+                # elif item['type'] == 'bag':
+                #     rospy.loginfo('Creating BagItem: %s', item['display'])
+                #     self.items.append(ItemBag(item))
+                # elif item['type'] == 'launch':
+                #     rospy.loginfo('Creating LaunchItem: %s', item['display'])
+                #     self.items.append(ItemLaunch(item))
         rospy.loginfo("Finished Reading!")
     
     def tag_callback(self, data):
@@ -78,7 +78,7 @@ class Menu(object):
         menu_entries = ""
         for item in self.items:
             menu_entries += item.name + "\n"
-        menu_entries = "item 1 \n item 2 \n item 3 \n" #debug
+        #menu_entries = "item 1 \n item 2 \n item 3 \n" #debug
         self.display_pub.publish(menu_entries)  
         #rospy.loginfo('Published to display.')
 

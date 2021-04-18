@@ -48,6 +48,14 @@ class Display(object):
             rospy.loginfo("Created ui2ros pipe.")
             rospy.loginfo("Created named pipes.")
 
+    def display_get_response(self):
+        while not rospy.is_shutdown():
+            menu_string = self.ui2ros_pipe.read()
+            # send back to menu
+            if len(menu_string) != 0:
+                rospy.loginfo("Selected menu item %s\n", menu_string) 
+                # Should create a tag response here? unsure, TODO
+
    
     def display_update_callback(self, data):
         self.ros2ui_pipe.write(data)
@@ -55,6 +63,7 @@ class Display(object):
 
 if __name__=='__main__':
     d = Display()
+    d.display_get_response();
 
     while not rospy.is_shutdown():
         d.rate.sleep()
