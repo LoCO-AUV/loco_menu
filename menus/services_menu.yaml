@@ -2,24 +2,6 @@ menu:
   name: "LoCO MENU"
   items:
     - menu:
-        name: "ADROC_ MENU"
-        items:
-          - rosaction:
-              name: 'Approach Diver'
-              pre_delay: 1.0
-              post_delay: 0.0
-              background: True
-              kill_after_timeout: False
-              timeout: 120
-
-              action: adroc
-              action_class: adroc.msg.ApproachDiverAction
-              goal_class: adroc.msg.ApproachDiverGoal
-              feedback_class: adroc.msg.ApproachDiverFeedback
-              result_class: adroc.msg.ApproachDiverResult
-              goal_data: 0
-
-    - menu:
         name: "SRV_MENU"
         items:
           - rosservice:
@@ -33,9 +15,9 @@ menu:
               service: /loco/controller/thrust
               service_class: loco_pilot.srv.Thrust
               params: 
-                duration: 10.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
+                duration: 1.0     #TODO: Possible param support? 'rp/motion_primatives_controller/forward_duration'
                 distance: 0.0
-                thrust: 0.4         #'rp/motion_primatives_controller/forward_thrust'
+                thrust: 0.1         #'rp/motion_primatives_controller/forward_thrust'
           - rosservice: 
               name: 'Square'
               pre_delay: 2.0

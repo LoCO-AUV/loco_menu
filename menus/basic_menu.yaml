@@ -1,0 +1,52 @@
+menu:
+  name: "LoCO MENU"
+  items:
+    - menu:
+        name: "DATA_MENU"
+        items:
+          - roslaunch:
+              name: 'RCam (10m)'
+              pre_delay: 1.0
+              post_delay: 0.0
+              background: True
+              kill_after_timeout: True
+              timeout: 600
+
+              package: loco_launch
+              launch_file: bag_right_camera.launch
+              args: []
+          - roslaunch:
+              name: 'Stero (10m)'
+              pre_delay: 1.0
+              post_delay: 0.0
+              background: True
+              kill_after_timeout: True
+              timeout: 600
+
+              package: loco_launch
+              launch_file: bag_stereo.launch
+              args: []
+
+          - roslaunch:
+              name: 'Odom (10m)'
+              pre_delay: 1.0
+              post_delay: 0.0
+              background: True
+              kill_after_timeout: True
+              timeout: 600
+
+              package: loco_launch
+              launch_file: bag_odometry.launch
+              args: []
+
+          - roslaunch:
+              name: 'Stereo-Odom (10m)'
+              pre_delay: 1.0
+              post_delay: 0.0
+              background: True
+              kill_after_timeout: True
+              timeout: 600
+
+              package: loco_launch
+              launch_file: bag_stereo_imu.launch
+              args: []

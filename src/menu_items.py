@@ -60,10 +60,13 @@ class ItemService(Item):
         return "Item: name=%r type=%r service=%r params=%r"%(self.name, "Service", self.service, self.params)
 
     def execute(self):
-        rospy.loginfo('Executings service item')
-        msg = String()
-        msg.data = "LIT; EXEC:%s"%(self.name)
-        self.parent.display_publisher.publish(msg)
+        rospy.loginfo('Executing service item')
+        
+        self.parent.display_obj.set_text_size(2)
+        self.parent.display_obj.set_cursor(0,1)
+        self.parent.display_obj.clear_display()
+        self.parent.display_obj.print_line(f"{self.name}")
+        self.parent.display_obj.display()
 
         if(self.pre_delay > 0):
             rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
@@ -90,9 +93,11 @@ class ItemKill(Item):
 
     def execute(self):
         rospy.loginfo('Executing node kill item')
-        msg = String()
-        msg.data = "LIT; EXEC:%s"%(self.name)
-        self.parent.display_publisher.publish(msg)
+        self.parent.display_obj.set_text_size(2)
+        self.parent.display_obj.set_cursor(0,1)
+        self.parent.display_obj.clear_display()
+        self.parent.display_obj.print_line(f"{self.name}")
+        self.parent.display_obj.display()
 
         if(self.pre_delay > 0):
             rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
@@ -123,7 +128,7 @@ class ItemAction(Item):
         
 
         self.action_client = actionlib.SimpleActionClient(self.action, self.action_class)
-        self.action_client.wait_for_server()
+        #self.action_client.wait_for_server()
 
     def __str__(self):
          return "Item: name=%r type=%r action=%r"%(self.name, "Action", self.action)
@@ -133,9 +138,11 @@ class ItemAction(Item):
         if not self.running:
             rospy.loginfo("Executing action item")
 
-            msg = String()
-            msg.data = "LIT; EXEC:%s"%(self.name)
-            self.parent.display_publisher.publish(msg)
+            self.parent.display_obj.set_text_size(2)
+            self.parent.display_obj.set_cursor(0,1)
+            self.parent.display_obj.clear_display()
+            self.parent.display_obj.print_line(f"{self.name}")
+            self.parent.display_obj.display()
 
             if(self.pre_delay > 0):
                 rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
@@ -163,9 +170,12 @@ class ItemAction(Item):
             
         else:
             rospy.loginfo("Canceling rosaction due to a request.")
-            msg = String()
-            msg.data = "LIT; Canceling"
-            self.parent.display_publisher.publish(msg)
+            self.parent.display_obj.set_text_size(2)
+            self.parent.display_obj.set_cursor(0,1)
+            self.parent.display_obj.clear_display()
+            self.parent.display_obj.print_line(f"CANCEL")
+            self.parent.display_obj.display()
+
             time.sleep(1)
             self.action_client.cancel_goal()
             self.deactivate()
@@ -173,9 +183,11 @@ class ItemAction(Item):
     def kill(self):
         if self.running:
             rospy.loginfo("Canceling rosaction due to a timeout.")
-            msg = String()
-            msg.data = "LIT; Canceling"
-            self.parent.display_publisher.publish(msg)
+            self.parent.display_obj.set_text_size(2)
+            self.parent.display_obj.set_cursor(0,1)
+            self.parent.display_obj.clear_display()
+            self.parent.display_obj.print_line(f"TIMEOUT")
+            self.parent.display_obj.display()
             time.sleep(1)
             self.action_client.cancel_goal()
             self.deactivate()
@@ -201,10 +213,12 @@ class ItemLaunch(Item):
     def execute(self):
         if not self.running:
             rospy.loginfo('Executing launch item')
-            msg = String()
-            msg.data = "LIT; EXEC:%s"%(self.name)
-            self.parent.display_publisher.publish(msg)
-
+            self.parent.display_obj.set_text_size(2)
+            self.parent.display_obj.set_cursor(0,1)
+            self.parent.display_obj.clear_display()
+            self.parent.display_obj.print_line(f"{self.name}")
+            self.parent.display_obj.display()
+            
             # Pre-delay
             if(self.pre_delay > 0):
                 rospy.loginfo("Waiting for %r seconds prior to execution."%(self.pre_delay))
@@ -227,7 +241,6 @@ class ItemLaunch(Item):
             if self.background and self.kill_after_timeout and (self.timeout > 0):
                 threading.Timer(self.timeout, self.kill ).start()
 
-
             # Post-delay
             if(self.post_delay > 0):
                 rospy.loginfo("Waiting for %r seconds after execution."%(self.post_delay))
@@ -236,9 +249,11 @@ class ItemLaunch(Item):
             self.set_foreground(False)
         else:
             rospy.loginfo("Canceling roslaunch due to a request.")
-            msg = String()
-            msg.data = "LIT; Canceling"
-            self.parent.display_publisher.publish(msg)
+            self.parent.display_obj.set_text_size(2)
+            self.parent.display_obj.set_cursor(0,1)
+            self.parent.display_obj.clear_display()
+            self.parent.display_obj.print_line(f"CANCEL")
+            self.parent.display_obj.display()
             time.sleep(1)
 
             self.launch.shutdown()
@@ -247,9 +262,11 @@ class ItemLaunch(Item):
     def kill(self):
         if self.running:
             rospy.loginfo("Canceling roslaunch due to timeout.")
-            msg = String()
-            msg.data = "LIT; Canceling"
-            self.parent.display_publisher.publish(msg)
+            self.parent.display_obj.set_text_size(2)
+            self.parent.display_obj.set_cursor(0,1)
+            self.parent.display_obj.clear_display()
+            self.parent.display_obj.print_line(f"TIMEOUT")
+            self.parent.display_obj.display()
             time.sleep(1)
 
             self.launch.shutdown()

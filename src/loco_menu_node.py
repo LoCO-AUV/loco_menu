@@ -20,6 +20,9 @@
 
 import rospy
 import yaml
+from time import sleep
+
+from loco_oled.ssd1325 import SSD1325
 
 from menu_node import MenuNode
 from menu import Menu
@@ -89,29 +92,48 @@ def menu_state_upate(menu):
 
 
 # Send an updated version of the menu display string to the display device.
-def menu_graphical_update(menu):
-    rospy.loginfo('Sending graphical update.')
-    rospy.loginfo(menu.to_display_string())
+def menu_graphical_update(oled, menu):
+    item_types = [Item, ItemService, ItemAction, ItemLaunch, ItemBag, ItemKill, ItemNode]
+    oled.set_cursor(0,0)
+    oled.set_text_size(1)
+    oled.clear_display()
 
-    msg = String()
-    msg.data = menu.to_display_string()
-    root_menu.display_publisher.publish(msg)
+    oled.print_line(f"0. <--  {menu.name}")
+    oled.print_line("---------------------")
+    for i, c in enumerate(menu.children):
+        if type(c) is Menu:
+            oled.print_line(f"{i+1}. {c.name}")
+        elif type(c) in item_types and not c.running:
+            oled.print_line(f"{i+1}. {c.name}")
+        elif type(c) in item_types and c.running:
+            oled.print_line(f"{i+1}. Kill {c.name}")
+
+    oled.display()
 
 if __name__ == '__main__':
-    rospy.init_node("loco_menu")
-    rate = rospy.Rate(10)
+    oled = SSD1325(name="loco_menu")
+    oled.configure_dimmensions()
+    oled.clear_display()
+    oled.draw_loco_logo()
+    oled.display()
+    sleep(2)
+
+    oled.set_text_size(1)
+    oled.set_text_color(1) # Important to remmeber to actually set text color.
+    oled.clear_display()
+    oled.display()
 
     rospy.Subscriber("/loco/tags", Tags, tag_callback)
-    display_pub = rospy.Publisher('/loco/menu_display', String, queue_size=1)
 
-    root_menu = build_menu(rospy.get_param('~menu_def_file'), display_pub)
-    menu_graphical_update(root_menu)
+    root_menu = build_menu(rospy.get_param('~menu_def_file'), oled)
+    menu_graphical_update(oled, root_menu)
 
+    rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         if input_unhandled:
             root_menu, display_changed = menu_state_upate(root_menu)
             if display_changed:
-                menu_graphical_update(root_menu)
+                menu_graphical_update(oled, root_menu)
             rospy.sleep(1)
             input_unhandled = False
 

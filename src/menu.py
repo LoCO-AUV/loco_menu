@@ -28,9 +28,9 @@ from ar_recog.msg import Tags, Tag
 from std_msgs.msg import Header, String
 
 class Menu(MenuNode): 
-    def __init__(self, parent, yaml_data, display_publisher):
+    def __init__(self, parent, yaml_data, display_obj):
         super(Menu, self).__init__(parent)
-        self.display_publisher = display_publisher
+        self.display_obj = display_obj
 
         # print(yaml_data)
         menu_data = yaml_data
@@ -41,7 +41,7 @@ class Menu(MenuNode):
             node_yaml = node[node_type]
 
             if node_type == 'menu':
-                self.children.append(Menu(self, node_yaml, display_publisher))
+                self.children.append(Menu(self, node_yaml, display_obj))
 
             elif node_type == 'rosaction':
                 rospy.loginfo('Creating ActionItem')
@@ -75,7 +75,7 @@ class Menu(MenuNode):
         return ret
 
     def to_display_string(self):
-        display_string = "LIT;      %s;"%(self.name)
+        display_string = f"MEN;      {self.name};"
         for idx, item in enumerate(self.children):
-            display_string += "%r. %s;"%((idx+1), item.name)
+            display_string += f"{idx+1}. {item.name};"
         return display_string
